@@ -92,7 +92,7 @@ def main():
     failed_entries = 0
 
     # Display current orders loaded from inventory.txt
-    print("Current Orders:\n")
+    print("Current Orders from previous entries:\n")
     if history:
         for order_id, product, qty in history:
             print(f"{order_id}, {product}, {qty}")
