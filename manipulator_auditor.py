@@ -29,7 +29,7 @@ def save_inventory(inventory):
     try:
         with open(FILENAME, "w") as file:
             json.dump(inventory, file, indent=4)
-        print("Inventory saved successfully to inventory.json.")
+        print("Inventory saved successfully to inventory.json. <(^-^)>")
     except IOError as e:
         print(f"Failed to save inventory: {e}")
 
@@ -78,7 +78,7 @@ def add_product(inventory):
     }
     
     inventory.append(new_product)
-    print("\nProduct added successfully!")
+    print("\nProduct added successfully! <(^-^)>")
 
 
 def update_stock(inventory):
@@ -95,7 +95,7 @@ def update_stock(inventory):
             try:
                 new_stock = int(input("New Stock Quantity: "))
                 item["stock"] = new_stock
-                print("\nStock quantity updated successfully!")
+                print("\nStock quantity updated successfully! <(^-^)>")
             except ValueError:
                 print("Invalid quantity entered. Stock update canceled.")
             return
@@ -132,12 +132,12 @@ def main():
 
     while True:
         print("\nMenu Options:")
-        print("1. Display All Products")
-        print("2. Add Product")
-        print("3. Update Stock")
-        print("4. Search Product")
-        print("5. Save Inventory")
-        print("6. Save and Quit")
+        print("1. Display All Products 📋")
+        print("2. Add Product 🛒")
+        print("3. Update Stock 📦")
+        print("4. Search Product 🔍")
+        print("5. Save Inventory 💾")
+        print("6. Save and Quit 🚪")
         
         choice = input("\nEnter option: ").strip()
 
