@@ -97,7 +97,7 @@ def update_stock(inventory):
                 item["stock"] = new_stock
                 print("\nStock quantity updated successfully! <(^-^)>")
             except ValueError:
-                print("Invalid quantity entered. Stock update canceled.")
+                print("Invalid quantity entered. Stock update canceled. :(")
             return
             
     print("Product not found.")
