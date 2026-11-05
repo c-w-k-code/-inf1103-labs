@@ -46,7 +46,103 @@ class Product:
         """Display single product details in the required format."""
         print(f"ID:{self._product_id} | Name: {self.name} | Price: ${self._price:.2f} | Stock: {self._stock}")
 
+    @abstractmethod
+    def get_fufillment_info(self):
+        """Abstract method to get fulfillment information for the product."""
+        pass
 
+    def to_dict(self):
+        """Convert Product object to dictionary for JSON serialization."""
+        return {
+            "id": self._product_id,
+            "name": self.name,
+            "price": self._price,
+            "stock": self._stock
+        }
+
+
+# -------------------------------------------------------------------
+# PHYSICAL PRODUCT
+# -------------------------------------------------------------------
+class PhysicalProduct(Product, CanBeShipped):
+    BASE_SHIPPING = 1.00
+    COST_PER_KG = 2.00
+ 
+    def __init__(self, product_id, name, price, stock, weight):
+        super().__init__(product_id, name, price, stock)
+        self._weight = weight
+ 
+    @property
+    def weight(self):
+        return self._weight
+ 
+    def display_information(self):
+        super().display_information()
+        print(f"    Weight: {self._weight} kg")
+ 
+    def get_fulfilment_info(self):
+        return "This product requires physical shipping."
+ 
+    def calculate_shipping_cost(self):
+        """Simple rule: base fee + a fixed rate per kg."""
+        return self.BASE_SHIPPING + self.COST_PER_KG * self._weight
+ 
+    def to_dict(self):
+        data = super().to_dict()
+        data["type"] = "physical"
+        data["weight"] = self._weight
+        return data
+ 
+    @classmethod
+    def from_dict(cls, data):
+        return cls(data["id"], data["name"], data["price"], data["stock"], data["weight"])
+ 
+
+# -------------------------------------------------------------------
+# DIGITAL PRODUCT
+# -------------------------------------------------------------------
+class DigitalProduct(Product):
+    def __init__(self, product_id, name, price, stock, download_size):
+        super().__init__(product_id, name, price, stock)
+        self._download_size = download_size
+ 
+    @property
+    def download_size(self):
+        return self._download_size
+ 
+    def display_information(self):
+        super().display_information()
+        print(f"    Download Size: {self._download_size} MB")
+ 
+    def get_fulfilment_info(self):
+        return "This product is delivered digitally via download."
+ 
+    def to_dict(self):
+        data = super().to_dict()
+        data["type"] = "digital"
+        data["download_size"] = self._download_size
+        return data
+ 
+    @classmethod
+    def from_dict(cls, data):
+        return cls(data["id"], data["name"], data["price"], data["stock"], data["download_size"])
+ 
+ 
+# Registry mapping the saved "type" identifier to the class that rebuilds it.
+PRODUCT_TYPES = {
+    "physical": PhysicalProduct,
+    "digital": DigitalProduct,
+}
+ 
+ 
+def product_from_dict(data):
+    """Create the Product subclass from a saved dictionary."""
+    product_type = data.get("type", "physical")
+    if product_type == "physical" and "weight" not in data:
+        data = {**data, "weight": 0.0}
+    return PRODUCT_TYPES[product_type].from_dict(data)
+ 
+ 
 # -------------------------------------------------------------------
 # INVENTORY CLASS 
 # -------------------------------------------------------------------
