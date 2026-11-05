@@ -1,6 +1,6 @@
-# -------------------------------------------------------------------
-# INTERFACE
-# -------------------------------------------------------------------
+from abc import ABC, abstractmethod
+
+
 class CanBeShipped(ABC):
     """Contract for anything that can be shipped. No attributes, no implementation."""
 

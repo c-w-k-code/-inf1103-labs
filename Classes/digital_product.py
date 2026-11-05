@@ -1,7 +1,6 @@
+from Product import Product
 
-# -------------------------------------------------------------------
-# DIGITAL PRODUCT
-# -------------------------------------------------------------------
+
 class DigitalProduct(Product):
     def __init__(self, product_id, name, price, stock, download_size):
         super().__init__(product_id, name, price, stock)
@@ -28,19 +27,3 @@ class DigitalProduct(Product):
     @classmethod
     def from_dict(cls, data):
         return cls(data["id"], data["name"], data["price"], data["stock"], data["download_size"])
-
-
-# Registry mapping the saved "type" identifier to the class that rebuilds it.
-
-PRODUCT_TYPES = {
-    "physical": PhysicalProduct,
-    "digital": DigitalProduct,
-}
-
-
-def product_from_dict(data):
-    """Create the correct Product subclass from a saved dictionary."""
-    product_type = data.get("type", "physical")
-    if product_type == "physical" and "weight" not in data:
-        data = {**data, "weight": 0.0}
-    return PRODUCT_TYPES[product_type].from_dict(data)

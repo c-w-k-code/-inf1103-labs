@@ -1,6 +1,6 @@
-# -------------------------------------------------------------------
-# PRODUCT CLASS 
-# -------------------------------------------------------------------
+from abc import ABC, abstractmethod
+
+
 class Product(ABC):
     def __init__(self, product_id, name, price, stock):
         self._product_id = product_id

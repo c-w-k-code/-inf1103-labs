@@ -1,7 +1,7 @@
+from Product import Product
+from CanBeShipped import CanBeShipped
 
-# -------------------------------------------------------------------
-# PHYSICAL PRODUCT
-# -------------------------------------------------------------------
+
 class PhysicalProduct(Product, CanBeShipped):
     """Single class inheritance (Product) + one interface (CanBeShipped)."""
 

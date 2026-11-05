@@ -1,23 +1,7 @@
-import json
-import os
-from abc import ABC, abstractmethod
-
-FILENAME = "inventory.json"
+from baseline_products import load_inventory, save_inventory
+from ui import add_product_ui, update_stock_ui, search_product_ui
 
 
-
-
-
-
-
-
-
-
-
-
-# -------------------------------------------------------------------
-# Main
-# -------------------------------------------------------------------
 def main():
     inventory = load_inventory()
 
