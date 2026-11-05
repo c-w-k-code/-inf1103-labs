@@ -1,6 +1,6 @@
 import json
 import os
-import abc import ABC, abstractmethod
+from abc import ABC, abstractmethod
 
 FILENAME = "inventory.json"
 
@@ -8,7 +8,8 @@ FILENAME = "inventory.json"
 # -------------------------------------------------------------------
 # SHIPPING (ABSTRACT) 
 # -------------------------------------------------------------------
-class CanBeShipping(ABC):
+class CanBeShipped(ABC):
+   
     @abstractmethod
     def calculate_shipping_cost(self):
         """Calculate shipping cost for the product."""
@@ -65,7 +66,7 @@ class Product:
 # PHYSICAL PRODUCT
 # -------------------------------------------------------------------
 class PhysicalProduct(Product, CanBeShipped):
-    BASE_SHIPPING = 1.00
+    BASE_SHIPPING = 1.99
     COST_PER_KG = 2.00
  
     def __init__(self, product_id, name, price, stock, weight):
@@ -189,17 +190,16 @@ def load_inventory():
             with open(FILENAME, "r") as file:
                 data = json.load(file)
                 for item in data:
-                    product = Product(item["id"], item["name"], item["price"], item["stock"])
-                    inventory.add_product(product)
+                   inventory.add_product(product_from_dict(item))
                 return inventory
-        except (json.JSONDecodeError, IOError):
+        except (json.JSONDecodeError, IOError, KeyError):
             print("Error reading saved file. Starting with default inventory.")
     
     # Default products if file doesn't exist or error occurs
     default_products = [
-        Product("P001", "Laptop", 1999.99, 15),
-        Product("P002", "Mouse", 25.00, 40),
-        Product("P003", "Keyboard", 75.50, 20)
+        PhysicalProduct("P001", "Laptop", 1999.99, 15, 2.2),
+        PhysicalProduct("P002", "Mouse", 25.00, 40, 0.1),
+        DigitalProduct("P003", "Roblox", 2.99, 20, 100.0)
     ]
     for p in default_products:
         inventory.add_product(p)
@@ -209,14 +209,7 @@ def load_inventory():
 def save_inventory(inventory):
     """Save the current inventory collection to inventory.json as dictionaries."""
     try:
-        data = []
-        for product in inventory.products:
-            data.append({
-                "id": product.product_id,
-                "name": product.name,
-                "price": product.price,
-                "stock": product.stock
-            })
+        data = [product.to_dict() for product in inventory.products]
         with open(FILENAME, "w") as file:
             json.dump(data, file, indent=4)
         print("Inventory saved successfully to inventory.json. <(^-^)>")
@@ -262,7 +255,7 @@ def add_product_ui(inventory):
     inventory.add_product(new_product)
     print("\nProduct added successfully! <(^-^)>")
 
-    
+
 def update_stock_ui(inventory):
     """Update stock quantity for a given product ID."""
     print("\nUpdate Stock")
