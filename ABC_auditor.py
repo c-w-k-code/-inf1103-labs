@@ -6,21 +6,21 @@ FILENAME = "inventory.json"
 
 
 # -------------------------------------------------------------------
-# SHIPPING (ABSTRACT) 
+# INTERFACE
 # -------------------------------------------------------------------
 class CanBeShipped(ABC):
-   
+    """Contract for anything that can be shipped. No attributes, no implementation."""
+
     @abstractmethod
     def calculate_shipping_cost(self):
-        """Calculate shipping cost for the product."""
+        """Return the shipping cost for this object."""
         pass
-
 
 
 # -------------------------------------------------------------------
 # PRODUCT CLASS 
 # -------------------------------------------------------------------
-class Product:
+class Product(ABC):
     def __init__(self, product_id, name, price, stock):
         self._product_id = product_id
         self.name = name
@@ -44,21 +44,21 @@ class Product:
         self._stock = quantity
 
     def display_information(self):
-        """Display single product details in the required format."""
+        """Display the common product details (children extend this)."""
         print(f"ID:{self._product_id} | Name: {self.name} | Price: ${self._price:.2f} | Stock: {self._stock}")
 
     @abstractmethod
-    def get_fufillment_info(self):
-        """Abstract method to get fulfillment information for the product."""
+    def get_fulfilment_info(self):
+        """Return a message describing how this product is fulfilled."""
         pass
 
     def to_dict(self):
-        """Convert Product object to dictionary for JSON serialization."""
+        """Common data used for saving; subclasses add their own fields."""
         return {
             "id": self._product_id,
             "name": self.name,
             "price": self._price,
-            "stock": self._stock
+            "stock": self._stock,
         }
 
 
@@ -66,38 +66,42 @@ class Product:
 # PHYSICAL PRODUCT
 # -------------------------------------------------------------------
 class PhysicalProduct(Product, CanBeShipped):
-    BASE_SHIPPING = 1.99
+    """Single class inheritance (Product) + one interface (CanBeShipped)."""
+
+    BASE_SHIPPING = 5.00
     COST_PER_KG = 2.00
- 
+
     def __init__(self, product_id, name, price, stock, weight):
         super().__init__(product_id, name, price, stock)
         self._weight = weight
- 
+
     @property
     def weight(self):
         return self._weight
- 
+
     def display_information(self):
         super().display_information()
         print(f"    Weight: {self._weight} kg")
- 
+        print(f"    Fulfilment: {self.get_fulfilment_info()}")
+        print(f"    Shipping Cost: ${self.calculate_shipping_cost():.2f}")
+
     def get_fulfilment_info(self):
         return "This product requires physical shipping."
- 
+
     def calculate_shipping_cost(self):
         """Simple rule: base fee + a fixed rate per kg."""
         return self.BASE_SHIPPING + self.COST_PER_KG * self._weight
- 
+
     def to_dict(self):
         data = super().to_dict()
         data["type"] = "physical"
         data["weight"] = self._weight
         return data
- 
+
     @classmethod
     def from_dict(cls, data):
         return cls(data["id"], data["name"], data["price"], data["stock"], data["weight"])
- 
+
 
 # -------------------------------------------------------------------
 # DIGITAL PRODUCT
@@ -106,46 +110,48 @@ class DigitalProduct(Product):
     def __init__(self, product_id, name, price, stock, download_size):
         super().__init__(product_id, name, price, stock)
         self._download_size = download_size
- 
+
     @property
     def download_size(self):
         return self._download_size
- 
+
     def display_information(self):
         super().display_information()
         print(f"    Download Size: {self._download_size} MB")
- 
+        print(f"    Fulfilment: {self.get_fulfilment_info()}")
+
     def get_fulfilment_info(self):
         return "This product is delivered digitally via download."
- 
+
     def to_dict(self):
         data = super().to_dict()
         data["type"] = "digital"
         data["download_size"] = self._download_size
         return data
- 
+
     @classmethod
     def from_dict(cls, data):
         return cls(data["id"], data["name"], data["price"], data["stock"], data["download_size"])
- 
- 
+
+
 # Registry mapping the saved "type" identifier to the class that rebuilds it.
+
 PRODUCT_TYPES = {
     "physical": PhysicalProduct,
     "digital": DigitalProduct,
 }
- 
- 
+
+
 def product_from_dict(data):
-    """Create the Product subclass from a saved dictionary."""
+    """Create the correct Product subclass from a saved dictionary."""
     product_type = data.get("type", "physical")
     if product_type == "physical" and "weight" not in data:
         data = {**data, "weight": 0.0}
     return PRODUCT_TYPES[product_type].from_dict(data)
- 
- 
+
+
 # -------------------------------------------------------------------
-# INVENTORY CLASS 
+# INVENTORY CLASS
 # -------------------------------------------------------------------
 class Inventory:
     def __init__(self):
@@ -183,23 +189,23 @@ class Inventory:
 # PERSISTENCE
 # -------------------------------------------------------------------
 def load_inventory():
-    """Load inventory from inventory.json into Product objects, otherwise return default products."""
+    """Load inventory from inventory.json, otherwise return default products."""
     inventory = Inventory()
     if os.path.exists(FILENAME):
         try:
             with open(FILENAME, "r") as file:
                 data = json.load(file)
-                for item in data:
-                   inventory.add_product(product_from_dict(item))
-                return inventory
+            for item in data:
+                inventory.add_product(product_from_dict(item))
+            return inventory
         except (json.JSONDecodeError, IOError, KeyError):
             print("Error reading saved file. Starting with default inventory.")
-    
-    # Default products if file doesn't exist or error occurs
+            inventory = Inventory()
+
     default_products = [
         PhysicalProduct("P001", "Laptop", 1999.99, 15, 2.2),
         PhysicalProduct("P002", "Mouse", 25.00, 40, 0.1),
-        DigitalProduct("P003", "Roblox", 2.99, 20, 100.0)
+        DigitalProduct("D001", "Antivirus Software", 49.99, 100, 350.0),
     ]
     for p in default_products:
         inventory.add_product(p)
@@ -207,7 +213,7 @@ def load_inventory():
 
 
 def save_inventory(inventory):
-    """Save the current inventory collection to inventory.json as dictionaries."""
+    """Save the inventory to inventory.json (each product describes itself)."""
     try:
         data = [product.to_dict() for product in inventory.products]
         with open(FILENAME, "w") as file:
@@ -216,28 +222,27 @@ def save_inventory(inventory):
     except IOError as e:
         print(f"Failed to save inventory: {e}")
 
+
 # -------------------------------------------------------------------
 # UI FUNCTIONS
 # -------------------------------------------------------------------
 def add_product_ui(inventory):
-    """Prompt user for details and add a new Product to the inventory."""
+    """Prompt user for details and add a new physical or digital product."""
     print("\nAdd New Product")
     print("1. Physical Product")
     print("2. Digital Product")
-    type_choice = input("Product Type (1 or 2): ").strip()
-    if type_choice not in ["1", "2"]:
-        print("Invalid choice. Product addition canceled. :(")
+    type_choice = input("Product type: ").strip()
+    if type_choice not in ("1", "2"):
+        print("Invalid product type.")
         return
 
     product_id = input("Product ID: ").strip()
-    
-    # Check for duplicate ID using Inventory search
     if inventory.search_product(product_id):
         print(f"Error: Product ID {product_id} already exists.")
         return
 
     name = input("Product Name: ").strip()
-    
+
     try:
         price = float(input("Price: "))
         stock = int(input("Stock Quantity: "))
@@ -247,7 +252,6 @@ def add_product_ui(inventory):
         else:
             download_size = float(input("Download Size (MB): "))
             new_product = DigitalProduct(product_id, name, price, stock, download_size)
-    
     except ValueError:
         print("Invalid input. Price, weight and download size must be numbers and Stock must be an integer.")
         return
@@ -260,13 +264,13 @@ def update_stock_ui(inventory):
     """Update stock quantity for a given product ID."""
     print("\nUpdate Stock")
     search_id = input("Enter Product ID: ").strip()
-    
+
     product = inventory.search_product(search_id)
     if product:
         print("Product Found:")
         print(f"Name: {product.name}")
         print(f"Current Stock: {product.stock}\n")
-        
+
         try:
             new_stock = int(input("New Stock Quantity: "))
             product.update_stock(new_stock)
@@ -281,18 +285,16 @@ def search_product_ui(inventory):
     """Search for a product by ID and display its details."""
     print("\nSearch Product")
     search_id = input("Enter Product ID: ").strip()
-    
+
     product = inventory.search_product(search_id)
     if product:
         print("\nProduct Found")
         print("------------------------------------------------")
-        print(f"ID: {product.product_id}")
-        print(f"Name: {product.name}")
-        print(f"Price: ${product.price:.2f}")
-        print(f"Stock: {product.stock}")
+        product.display_information()
         print("------------------------------------------------")
     else:
         print("Product not found")
+
 
 # -------------------------------------------------------------------
 # Main
@@ -308,7 +310,7 @@ def main():
         print("4. Search Product 🔍")
         print("5. Save Inventory 💾")
         print("6. Save and Quit 🚪")
-        
+
         choice = input("\nEnter option: ").strip()
 
         if choice == "1":
@@ -333,4 +335,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()        
+    main()
