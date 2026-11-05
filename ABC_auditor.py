@@ -178,6 +178,9 @@ class Inventory:
         return self._products
 
 
+# -------------------------------------------------------------------
+# PERSISTENCE
+# -------------------------------------------------------------------
 def load_inventory():
     """Load inventory from inventory.json into Product objects, otherwise return default products."""
     inventory = Inventory()
@@ -220,10 +223,19 @@ def save_inventory(inventory):
     except IOError as e:
         print(f"Failed to save inventory: {e}")
 
-
+# -------------------------------------------------------------------
+# UI FUNCTIONS
+# -------------------------------------------------------------------
 def add_product_ui(inventory):
     """Prompt user for details and add a new Product to the inventory."""
     print("\nAdd New Product")
+    print("1. Physical Product")
+    print("2. Digital Product")
+    type_choice = input("Product Type (1 or 2): ").strip()
+    if type_choice not in ["1", "2"]:
+        print("Invalid choice. Product addition canceled. :(")
+        return
+
     product_id = input("Product ID: ").strip()
     
     # Check for duplicate ID using Inventory search
@@ -236,15 +248,21 @@ def add_product_ui(inventory):
     try:
         price = float(input("Price: "))
         stock = int(input("Stock Quantity: "))
+        if type_choice == "1":
+            weight = float(input("Weight (kg): "))
+            new_product = PhysicalProduct(product_id, name, price, stock, weight)
+        else:
+            download_size = float(input("Download Size (MB): "))
+            new_product = DigitalProduct(product_id, name, price, stock, download_size)
+    
     except ValueError:
-        print("Invalid input. Price must be a number and Stock must be an integer.")
+        print("Invalid input. Price, weight and download size must be numbers and Stock must be an integer.")
         return
 
-    new_product = Product(product_id, name, price, stock)
     inventory.add_product(new_product)
     print("\nProduct added successfully! <(^-^)>")
 
-
+    
 def update_stock_ui(inventory):
     """Update stock quantity for a given product ID."""
     print("\nUpdate Stock")
