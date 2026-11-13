@@ -1,23 +1,35 @@
+from __future__ import annotations
+
+from Product import Product
+from Classes import supplier
+
 
 # -------------------------------------------------------------------
 # INVENTORY CLASS
 # -------------------------------------------------------------------
 class Inventory:
-    def __init__(self):
-        self._products = []
+    def __init__(self) -> None:
+        self._products: list[Product] = []
 
-    def add_product(self, product):
+    def add_product(self, product: Product) -> None:
         """Add a Product object to the inventory collection."""
         self._products.append(product)
 
-    def search_product(self, product_id):
+    def remove_product(self, product_id: str) -> Product | None:
+        """Remove a product from the inventory by its ID."""
+        product = self.search_product(product_id)
+        if product is not None:
+            self._products.remove(product)
+        return product
+
+    def search_product(self, product_id: str) -> Product | None:
         """Search for a product by ID and return the Product object or None."""
         for product in self._products:
             if product.product_id.upper() == product_id.upper():
                 return product
         return None
 
-    def display_all(self):
+    def display_all(self) -> None:
         """Display all products in inventory."""
         print("\nCurrent Inventory")
         print("-------------------------")
@@ -28,7 +40,15 @@ class Inventory:
                 product.display_information()
         print("-------------------------")
 
+    def get_suppliers(self) -> list[supplier.Supplier]:
+        """Return a list of all unique suppliers in the inventory."""
+        suppliers:dict[str, supplier.Supplier] = {}
+        for product in self._products:
+            if product.supplier:
+                suppliers[product.supplier.supplier_id] = product.supplier
+        return list(suppliers.values())
+
     @property
-    def products(self):
+    def products(self) -> list[Product]:
         """Return the list of products for persistence/serialization."""
         return self._products
