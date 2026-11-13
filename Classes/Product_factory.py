@@ -9,7 +9,7 @@ from Digital_product import DigitalProduct
 
 # Registry mapping the saved "type" identifier to the class that rebuilds it.
 
-PRODUCT_TYPES: dict[str, type[Product] | type[DigitalProduct]] = {
+PRODUCT_TYPES: dict[str, type[PhysicalProduct] | type[DigitalProduct]] = {
     "physical": PhysicalProduct,
     "digital": DigitalProduct,
 }

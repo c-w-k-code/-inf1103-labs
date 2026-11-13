@@ -8,8 +8,8 @@ class OrderLine:
     Product (assosciation). Created and managed by order (composition)"""
     
     def __init__(self, product: Product, quantity: int) -> None:
-        self.product: Product = product
-        self.quantity: int = quantity
+        self._product: Product = product
+        self._quantity: int = quantity
 
     @property
     def product(self) -> Product:

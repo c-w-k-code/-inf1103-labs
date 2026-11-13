@@ -1,4 +1,4 @@
-from Baseline_products import load_inventory, save_inventory
+from Persistence import load_inventory, save_inventory
 from Ui import add_product_ui, update_stock_ui, search_product_ui, remove_product_ui, create_order_ui
 
 
@@ -40,7 +40,7 @@ def main() -> None:
             print("Program terminated.")
             break
         else:
-            print("Invalid option. Please enter a number between 1 and 6.")
+            print("Invalid option. Please enter a number between 1 and 8.")
 
 
 if __name__ == "__main__":

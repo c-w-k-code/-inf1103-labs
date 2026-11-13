@@ -3,7 +3,6 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any
 
-from Digital_product import DigitalProduct
 from Supplier import Supplier
 
 class Product(ABC):
@@ -12,7 +11,7 @@ class Product(ABC):
         self.name = name
         self._price = price
         self._stock = stock
-        self.supplier: Supplier = supplier 
+        self._supplier: Supplier = supplier
         
 
     @property
@@ -54,7 +53,3 @@ class Product(ABC):
             "stock": self._stock,
             "supplier_id": self._supplier.supplier_id,
         }
-
-    @classmethod
-    def from_dict(cls, data: dict[str, Any], supplier: Supplier) -> DigitalProduct:
-        return cls(data["id"], data["name"], data["price"], data["stock"], supplier, data["download_size"])

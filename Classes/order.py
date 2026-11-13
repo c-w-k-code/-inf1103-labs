@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from Classes import Product
+from Product import Product
 from Order_line import OrderLine
 
 class Order:
@@ -45,5 +45,3 @@ class Order:
             order_line.display_information()
         print(f"Total Order Cost: ${self.calculate_total():.2f}")
         print("-------------------------")
-
-       

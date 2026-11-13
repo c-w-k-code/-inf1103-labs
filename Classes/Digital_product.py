@@ -31,5 +31,5 @@ class DigitalProduct(Product):
         return data
 
     @classmethod
-    def from_dict(cls, data):
-        return cls(data["id"], data["name"], data["price"], data["stock"], Supplier.from_dict(data["supplier"]), data["download_size"])
+    def from_dict(cls, data: dict[str, Any], supplier: Supplier) -> DigitalProduct:
+        return cls(data["id"], data["name"], data["price"], data["stock"], supplier, data["download_size"])

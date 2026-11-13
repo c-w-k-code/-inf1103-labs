@@ -11,8 +11,8 @@ from Digital_product import DigitalProduct
 # -------------------------------------------------------------------
 
 def _choose_supplier(inventory: Inventory) -> Supplier:
-    """Resuse or create a new supplier for a product."""
-    suppliers = {s.supplier_id: s for s in inventory.get_suppliers()}
+    """Reuse or create a new supplier for a product."""
+    suppliers = {s.supplier_id.upper(): s for s in inventory.get_suppliers()}
     print("\nSuppliers:")
     for supplier in suppliers.values():
         supplier.display_information(indent="    ")
@@ -49,10 +49,10 @@ def add_product_ui(inventory: Inventory) -> None:
         stock = int(input("Stock Quantity: "))
         if type_choice == "1":
             weight = float(input("Weight (kg): "))
-            new_product = PhysicalProduct(product_id, name, price, stock, weight)
+            new_product = PhysicalProduct(product_id, name, price, stock, supplier, weight)
         else:
             download_size = float(input("Download Size (MB): "))
-            new_product = DigitalProduct(product_id, name, price, stock, download_size)
+            new_product = DigitalProduct(product_id, name, price, stock, supplier, download_size)
     except ValueError:
         print("Invalid input. Price, weight and download size must be numbers and Stock must be an integer.")
         return
@@ -82,7 +82,7 @@ def update_stock_ui(inventory: Inventory) -> None:
         print("Product not found.")
 
 
-def search_product_ui(inventory) -> None:
+def search_product_ui(inventory: Inventory) -> None:
     """Search for a product by ID and display its details."""
     print("\nSearch Product")
     search_id = input("Enter Product ID: ").strip()
@@ -96,7 +96,7 @@ def search_product_ui(inventory) -> None:
     else:
         print("Product not found")
 
-def remove_product_ui(inventory) -> None:
+def remove_product_ui(inventory: Inventory) -> None:
     """Remove a product from the inventory. Not destroyed."""
     print("\nRemove Product")
     search_id = input("Enter Product ID to remove: ").strip()
@@ -108,7 +108,7 @@ def remove_product_ui(inventory) -> None:
     else:
         print("Product not found.")
 
-def create_order_ui(inventory) -> None:
+def create_order_ui(inventory: Inventory) -> None:
     """Build a new Order; OrderLines handled by itself"""
     print("\nCreate New Order")
     order = Order(input("Enter Order ID: ").strip())

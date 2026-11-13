@@ -42,5 +42,5 @@ class PhysicalProduct(Product, CanBeShipped):
         return data
 
     @classmethod
-    def from_dict(cls, data):
-        return cls(data["id"], data["name"], data["price"], data["stock"], Supplier, data["weight"])
+    def from_dict(cls, data: dict[str, Any], supplier: Supplier) -> PhysicalProduct:
+        return cls(data["id"], data["name"], data["price"], data["stock"], supplier, data["weight"])

@@ -20,7 +20,7 @@ class Supplier:
     def to_dict(self) -> dict[str, str]:
         """Data for saving."""
         return {
-            "supplier_id": self._supplier_id,
+            "id": self._supplier_id,
             "name": self.name,
             "contact_email": self.contact_email,
         }

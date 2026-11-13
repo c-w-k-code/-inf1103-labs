@@ -6,8 +6,6 @@ from Physical_product import PhysicalProduct
 from Digital_product import DigitalProduct
 
 
-FILENAME = "inventory.json"
-
 
 def create_default_inventory() -> Inventory:
     """Default products used when there is no (readable) saved file.
