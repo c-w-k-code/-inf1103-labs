@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from Classes import Product
-from Classes import OrderLine
+from Order_line import OrderLine
 
 class Order:
     """An order containing OrderLines(composition)."""
@@ -16,7 +16,7 @@ class Order:
 
     @property
     def order_lines(self) -> list[OrderLine]:
-        return self._order_lines
+        return list(self._order_lines) 
 
     def add_order_line(self, product: Product, quantity: int) -> None:
         """Created internally, added to this order"""

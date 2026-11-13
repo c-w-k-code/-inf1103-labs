@@ -1,11 +1,12 @@
 from __future__ import annotations
 
-from Classes import Product
+from Product import Product
 
 class OrderLine:
     """One product and its quantity in an order.
     
     Product (assosciation). Created and managed by order (composition)"""
+    
     def __init__(self, product: Product, quantity: int) -> None:
         self.product: Product = product
         self.quantity: int = quantity

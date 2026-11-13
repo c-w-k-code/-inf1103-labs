@@ -2,7 +2,7 @@ from __future__ import annotations
 
 
 class Supplier:
-    def __init__(self, supplier_id:str, name:str, contact_email:str):
+    def __init__(self, supplier_id:str, name:str, contact_email:str) -> None:
         self._supplier_id: str = supplier_id
         self.name: str = name
         self.contact_email: str = contact_email
@@ -11,7 +11,7 @@ class Supplier:
     def supplier_id(self) -> str:
         return self._supplier_id
 
-    def display_information(self, indent:str = ""):
+    def display_information(self, indent:str = "") -> None:
         """Display the supplier details."""
         print(f"{indent}Supplier ID: {self._supplier_id}")
         print(f"{indent}Name: {self.name}")
@@ -26,10 +26,6 @@ class Supplier:
         }
 
     @classmethod
-    def from_dict(cls, data: dict[str, str]):
+    def from_dict(cls, data: dict[str, str]) -> Supplier:
         """Create a Supplier instance from a dictionary."""
-        return cls(
-            supplier_id=data["supplier_id"],
-            name=data["name"],
-            contact_email=data["contact_email"]
-        )
+        return cls(data["id"], data["name"], data["contact_email"])

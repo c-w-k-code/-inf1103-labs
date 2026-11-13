@@ -1,10 +1,32 @@
-from physical_product import PhysicalProduct
-from digital_product import DigitalProduct
+from __future__ import annotations
+
+from Inventory import Inventory
+from Order import Order
+from Supplier import Supplier
+from Physical_product import PhysicalProduct
+from Digital_product import DigitalProduct
 
 # -------------------------------------------------------------------
 # UI FUNCTIONS
 # -------------------------------------------------------------------
-def add_product_ui(inventory):
+
+def _choose_supplier(inventory: Inventory) -> Supplier:
+    """Resuse or create a new supplier for a product."""
+    suppliers = {s.supplier_id: s for s in inventory.get_suppliers()}
+    print("\nSuppliers:")
+    for supplier in suppliers.values():
+        supplier.display_information(indent="    ")
+    supplier_id = input("\nEnter Supplier ID (existing or new): ").strip()
+
+    existing = suppliers.get(supplier_id.upper())
+    if existing is not None:
+        return existing
+
+    name = input("Enter Supplier Name: ").strip()
+    contact_email = input("Enter Supplier Contact Email: ").strip()
+    return Supplier(supplier_id, name, contact_email)
+
+def add_product_ui(inventory: Inventory) -> None:
     """Prompt user for details and add a new physical or digital product."""
     print("\nAdd New Product")
     print("1. Physical Product")
@@ -20,6 +42,7 @@ def add_product_ui(inventory):
         return
 
     name = input("Product Name: ").strip()
+    supplier = _choose_supplier(inventory)
 
     try:
         price = float(input("Price: "))
@@ -38,7 +61,7 @@ def add_product_ui(inventory):
     print("\nProduct added successfully! <(^-^)>")
 
 
-def update_stock_ui(inventory):
+def update_stock_ui(inventory: Inventory) -> None:
     """Update stock quantity for a given product ID."""
     print("\nUpdate Stock")
     search_id = input("Enter Product ID: ").strip()
@@ -59,7 +82,7 @@ def update_stock_ui(inventory):
         print("Product not found.")
 
 
-def search_product_ui(inventory):
+def search_product_ui(inventory) -> None:
     """Search for a product by ID and display its details."""
     print("\nSearch Product")
     search_id = input("Enter Product ID: ").strip()
@@ -72,3 +95,43 @@ def search_product_ui(inventory):
         print("------------------------------------------------")
     else:
         print("Product not found")
+
+def remove_product_ui(inventory) -> None:
+    """Remove a product from the inventory. Not destroyed."""
+    print("\nRemove Product")
+    search_id = input("Enter Product ID to remove: ").strip()
+
+    removed = inventory.remove_product(search_id)
+    if removed:
+        print(f"Product ID {search_id} removed successfully! <(^-^)>")
+        print("Note: The product is not destroyed and can be re-added later.")
+    else:
+        print("Product not found.")
+
+def create_order_ui(inventory) -> None:
+    """Build a new Order; OrderLines handled by itself"""
+    print("\nCreate New Order")
+    order = Order(input("Enter Order ID: ").strip())
+
+    while True:
+        product_id = input("\nEnter Product ID to add to order (leave blank to finish): ").strip()
+        if not product_id:
+            break
+
+        product = inventory.search_product(product_id)
+        if product is None:
+            print("Product not found.")
+            continue
+
+        try:
+            quantity = int(input(f"Enter quantity for {product.name}: "))
+        except ValueError:
+            print("Invalid quantity.")
+            continue
+        order.add_order_line(product, quantity)
+
+    if order.order_lines:
+        order.display_information()
+        print("\nOrders not saved")
+    else:
+        print("No items added. Order discarded.")

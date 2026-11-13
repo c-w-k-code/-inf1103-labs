@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from Product import Product
-from Classes import supplier
+from Supplier import Supplier
 
 
 # -------------------------------------------------------------------
@@ -40,12 +40,11 @@ class Inventory:
                 product.display_information()
         print("-------------------------")
 
-    def get_suppliers(self) -> list[supplier.Supplier]:
+    def get_suppliers(self) -> list[Supplier]:
         """Return a list of all unique suppliers in the inventory."""
-        suppliers:dict[str, supplier.Supplier] = {}
+        suppliers:dict[str, Supplier] = {}
         for product in self._products:
-            if product.supplier:
-                suppliers[product.supplier.supplier_id] = product.supplier
+            suppliers.setdefault(product.supplier.supplier_id, product.supplier)
         return list(suppliers.values())
 
     @property

@@ -1,8 +1,8 @@
-from baseline_products import load_inventory, save_inventory
-from ui import add_product_ui, update_stock_ui, search_product_ui, remove_product_ui, create_order_ui
+from Baseline_products import load_inventory, save_inventory
+from Ui import add_product_ui, update_stock_ui, search_product_ui, remove_product_ui, create_order_ui
 
 
-def main():
+def main() -> None:
     inventory = load_inventory()
 
     while True:
@@ -27,9 +27,13 @@ def main():
         elif choice == "4":
             search_product_ui(inventory)
         elif choice == "5":
+            remove_product_ui(inventory)
+        elif choice == "6":
+            create_order_ui(inventory)
+        elif choice == "7":
             print("\nSaving inventory...")
             save_inventory(inventory)
-        elif choice == "6":
+        elif choice == "8":
             print("\nSaving inventory before exit...")
             save_inventory(inventory)
             print("\nThank you for using Inventory Management System.")

@@ -4,7 +4,7 @@ from typing import Any
 
 from Product import Product
 from CanBeShipped import CanBeShipped
-from Classes import supplier
+from Supplier import Supplier
 
 
 
@@ -14,28 +14,28 @@ class PhysicalProduct(Product, CanBeShipped):
     BASE_SHIPPING = 5.00
     COST_PER_KG = 2.00
 
-    def __init__(self, product_id, name, price, stock, supplier, weight):
+    def __init__(self, product_id: str, name: str, price: float, stock: int, supplier: Supplier, weight: float) -> None:
         super().__init__(product_id, name, price, stock, supplier)
         self._weight = weight
 
     @property
-    def weight(self):
+    def weight(self) -> float:
         return self._weight
 
-    def display_information(self):
+    def display_information(self) -> None:
         super().display_information()
         print(f"    Weight: {self._weight} kg")
         print(f"    Fulfilment: {self.get_fulfilment_info()}")
         print(f"    Shipping Cost: ${self.calculate_shipping_cost():.2f}")
 
-    def get_fulfilment_info(self):
+    def get_fulfilment_info(self) -> str:
         return "This product requires physical shipping."
 
-    def calculate_shipping_cost(self):
+    def calculate_shipping_cost(self) -> float:
         """Simple rule: base fee + a fixed rate per kg."""
         return self.BASE_SHIPPING + self.COST_PER_KG * self._weight
 
-    def to_dict(self):
+    def to_dict(self) -> dict[str, Any]:
         data = super().to_dict()
         data["type"] = "physical"
         data["weight"] = self._weight
@@ -43,4 +43,4 @@ class PhysicalProduct(Product, CanBeShipped):
 
     @classmethod
     def from_dict(cls, data):
-        return cls(data["id"], data["name"], data["price"], data["stock"], supplier, data["weight"])
+        return cls(data["id"], data["name"], data["price"], data["stock"], Supplier, data["weight"])

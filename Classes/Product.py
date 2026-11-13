@@ -3,11 +3,11 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any
 
-from Classes import supplier
-from supplier import Supplier
+from Digital_product import DigitalProduct
+from Supplier import Supplier
 
 class Product(ABC):
-    def __init__(self, product_id, name, price, stock):
+    def __init__(self, product_id: str, name: str, price: float, stock: int, supplier: Supplier) -> None:
         self._product_id = product_id
         self.name = name
         self._price = price
@@ -16,36 +16,36 @@ class Product(ABC):
         
 
     @property
-    def product_id(self):
+    def product_id(self) -> str:
         return self._product_id
 
     @property
-    def price(self):
+    def price(self) -> float:
         return self._price
 
     @property
-    def stock(self):
+    def stock(self) -> int:
         return self._stock
 
     @property
-    def supplier(self):
+    def supplier(self) -> Supplier:
         return self._supplier
 
-    def update_stock(self, quantity):
+    def update_stock(self, quantity: int) -> None:
         """Update the stock quantity for the product securely."""
         self._stock = quantity
 
-    def display_information(self):
+    def display_information(self) -> None:
         """Display the common product details (children extend this)."""
         print(f"ID:{self._product_id} | Name: {self.name} | Price: ${self._price:.2f} | Stock: {self._stock}")
         self.supplier.display_information(indent="  ")
     
     @abstractmethod
-    def get_fulfilment_info(self):
+    def get_fulfilment_info(self) -> str:
         """Return a message describing how this product is fulfilled."""
         pass
 
-    def to_dict(self):
+    def to_dict(self) -> dict[str, Any]:
         """Common data used for saving; subclasses add their own fields."""
         return {
             "id": self._product_id,
@@ -54,3 +54,7 @@ class Product(ABC):
             "stock": self._stock,
             "supplier_id": self._supplier.supplier_id,
         }
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any], supplier: Supplier) -> DigitalProduct:
+        return cls(data["id"], data["name"], data["price"], data["stock"], supplier, data["download_size"])
