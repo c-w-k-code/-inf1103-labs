@@ -1,5 +1,5 @@
 from baseline_products import load_inventory, save_inventory
-from ui import add_product_ui, update_stock_ui, search_product_ui
+from ui import add_product_ui, update_stock_ui, search_product_ui, remove_product_ui, create_order_ui
 
 
 def main():
@@ -11,8 +11,10 @@ def main():
         print("2. Add Product 🛒")
         print("3. Update Stock 📦")
         print("4. Search Product 🔍")
-        print("5. Save Inventory 💾")
-        print("6. Save and Quit 🚪")
+        print("5. Remove Product 🗑️")
+        print("6. Create Order 🧾")
+        print("7. Save Inventory 💾")
+        print("8. Save and Quit 🚪")
 
         choice = input("\nEnter option: ").strip()
 
