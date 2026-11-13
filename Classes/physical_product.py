@@ -1,5 +1,11 @@
+from __future__ import annotations
+
+from typing import Any
+
 from Product import Product
 from CanBeShipped import CanBeShipped
+from Classes import supplier
+
 
 
 class PhysicalProduct(Product, CanBeShipped):
@@ -8,8 +14,8 @@ class PhysicalProduct(Product, CanBeShipped):
     BASE_SHIPPING = 5.00
     COST_PER_KG = 2.00
 
-    def __init__(self, product_id, name, price, stock, weight):
-        super().__init__(product_id, name, price, stock)
+    def __init__(self, product_id, name, price, stock, supplier, weight):
+        super().__init__(product_id, name, price, stock, supplier)
         self._weight = weight
 
     @property
@@ -37,4 +43,4 @@ class PhysicalProduct(Product, CanBeShipped):
 
     @classmethod
     def from_dict(cls, data):
-        return cls(data["id"], data["name"], data["price"], data["stock"], data["weight"])
+        return cls(data["id"], data["name"], data["price"], data["stock"], supplier, data["weight"])

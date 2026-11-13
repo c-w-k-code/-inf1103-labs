@@ -1,9 +1,14 @@
+from __future__ import annotations
+
+
 from Product import Product
+from Classes import supplier
+
 
 
 class DigitalProduct(Product):
-    def __init__(self, product_id, name, price, stock, download_size):
-        super().__init__(product_id, name, price, stock)
+    def __init__(self, product_id, name, price, stock, supplier, download_size):
+        super().__init__(product_id, name, price, stock, supplier)
         self._download_size = download_size
 
     @property
@@ -26,4 +31,4 @@ class DigitalProduct(Product):
 
     @classmethod
     def from_dict(cls, data):
-        return cls(data["id"], data["name"], data["price"], data["stock"], data["download_size"])
+        return cls(data["id"], data["name"], data["price"], data["stock"], supplier, data["download_size"])
