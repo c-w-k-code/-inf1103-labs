@@ -2,15 +2,26 @@ from __future__ import annotations
 
 from Inventory import Inventory
 from Order import Order
-from Supplier import Supplier
-from Physical_product import PhysicalProduct
-from Digital_product import DigitalProduct
-
 from Product_factory import ProductFactory
+from Supplier import Supplier
 
 # -------------------------------------------------------------------
 # UI FUNCTIONS
 # -------------------------------------------------------------------
+
+
+def get_positive_float(prompt: str) -> float:
+    """Prompt until the user enters a valid float greater than zero."""
+    while True:
+        try:
+            value = float(input(prompt))
+            if value <= 0:
+                print("Please enter a number greater than zero.")
+                continue
+            return value
+        except ValueError:
+            print("Please enter a valid number, e.g. 12.50")
+
 
 def _choose_supplier(inventory: Inventory) -> Supplier:
     """Reuse or create a new supplier for a product."""
@@ -27,6 +38,7 @@ def _choose_supplier(inventory: Inventory) -> Supplier:
     name = input("Enter Supplier Name: ").strip()
     contact_email = input("Enter Supplier Contact Email: ").strip()
     return Supplier(supplier_id, name, contact_email)
+
 
 def add_product_ui(inventory: Inventory) -> None:
     """Prompt user for details and add a new physical or digital product."""
@@ -46,8 +58,8 @@ def add_product_ui(inventory: Inventory) -> None:
     name = input("Product Name: ").strip()
     supplier = _choose_supplier(inventory)
 
+    price = get_positive_float("Price: ")
     try:
-        price = float(input("Price: "))
         stock = int(input("Stock Quantity: "))
         if type_choice == "1":
             extra = float(input("Weight (kg): "))
@@ -78,8 +90,8 @@ def update_stock_ui(inventory: Inventory) -> None:
             new_stock = int(input("New Stock Quantity: "))
             product.update_stock(new_stock)
             print("\nStock quantity updated successfully! <(^-^)>")
-        except ValueError:
-            print("Invalid quantity entered. Stock update canceled. :(")
+        except ValueError as exc:
+            print(f"Invalid stock value: {exc} Stock update canceled. :(")
     else:
         print("Product not found.")
 
@@ -98,6 +110,7 @@ def search_product_ui(inventory: Inventory) -> None:
     else:
         print("Product not found")
 
+
 def remove_product_ui(inventory: Inventory) -> None:
     """Remove a product from the inventory. Not destroyed."""
     print("\nRemove Product")
@@ -110,8 +123,9 @@ def remove_product_ui(inventory: Inventory) -> None:
     else:
         print("Product not found.")
 
+
 def create_order_ui(inventory: Inventory) -> None:
-    """Build a new Order; OrderLines handled by itself"""
+    """Build a new Order; OrderLines handled by itself."""
     print("\nCreate New Order")
     order = Order(input("Enter Order ID: ").strip())
 
@@ -127,10 +141,10 @@ def create_order_ui(inventory: Inventory) -> None:
 
         try:
             quantity = int(input(f"Enter quantity for {product.name}: "))
-        except ValueError:
-            print("Invalid quantity.")
+            order.add_order_line(product, quantity)
+        except ValueError as exc:
+            print(f"Invalid quantity: {exc}")
             continue
-        order.add_order_line(product, quantity)
 
     if order.order_lines:
         order.display_information()
