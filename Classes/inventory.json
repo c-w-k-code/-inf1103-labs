@@ -16,7 +16,7 @@
             "id": "P001",
             "name": "Laptop",
             "price": 1999.99,
-            "stock": 15,
+            "stock": 600,
             "supplier_id": "S001",
             "type": "physical",
             "weight": 2.2

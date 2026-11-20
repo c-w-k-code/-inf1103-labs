@@ -1,7 +1,15 @@
 from __future__ import annotations
 
+from DiscountStrategy import (
+    BulkDiscount,
+    DiscountStrategy,
+    NoDiscount,
+    PercentageDiscount,
+    StudentDiscount,
+)
 from Inventory import Inventory
 from Order import Order
+from Persistence import load_products
 from Product_factory import ProductFactory
 from Supplier import Supplier
 
@@ -69,6 +77,41 @@ def get_non_empty(prompt: str) -> str:
         if value:
             return value
         print("This field cannot be empty.")
+
+
+def get_percentage(prompt: str) -> float:
+    """Prompt until the user enters a percentage between 0 and 100."""
+    while True:
+        try:
+            value = float(input(prompt))
+            if value < 0 or value > 100:
+                print("Please enter a percentage between 0 and 100.")
+                continue
+            return value
+        except ValueError:
+            print("Please enter a valid number, e.g. 10")
+
+
+def choose_discount_ui() -> DiscountStrategy:
+    """Let the user pick a discount strategy (Strategy pattern: Order never sees the details)."""
+    print("\nSelect Discount")
+    print("1. No Discount")
+    print("2. Percentage Discount")
+    print("3. Bulk Discount (fixed amount off when total reaches a threshold)")
+    print("4. Student Discount")
+    while True:
+        choice = input("Discount option: ").strip()
+        if choice == "1":
+            return NoDiscount()
+        if choice == "2":
+            return PercentageDiscount(get_percentage("Percentage off (0-100): "))
+        if choice == "3":
+            threshold = get_positive_float("Threshold total: ")
+            amount = get_positive_float("Amount off: ")
+            return BulkDiscount(threshold, amount)
+        if choice == "4":
+            return StudentDiscount()
+        print("Invalid option. Please enter a number between 1 and 4.")
 
 
 def _choose_supplier(inventory: Inventory) -> Supplier:
@@ -188,7 +231,16 @@ def create_order_ui(inventory: Inventory) -> None:
         order.add_order_line(product, quantity)
 
     if order.order_lines:
+        order.set_discount(choose_discount_ui())
         order.display_information()
         print("\nOrders not saved")
     else:
         print("No items added. Order discarded.")
+
+
+def load_products_ui(inventory: Inventory) -> None:
+    """Load products from a CSV file via ProductFactory (bad rows are skipped, missing file handled)."""
+    print("\nLoad Products from CSV")
+    path = input("CSV file path (leave blank for products.csv): ").strip() or "products.csv"
+    supplier = _choose_supplier(inventory)
+    load_products(path, inventory, supplier)

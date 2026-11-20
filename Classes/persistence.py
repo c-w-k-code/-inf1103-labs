@@ -93,6 +93,8 @@ def load_products(path: str, inventory: Inventory, supplier: Supplier) -> None:
                             supplier=supplier,
                             extra=extra,
                         )
+                        if inventory.search_product(product_id):
+                            raise ValueError(f"Product ID {product_id} already exists.")
                         inventory.add_product(product)
                         loaded += 1
                     except ValueError as exc:

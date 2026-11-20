@@ -1,5 +1,5 @@
 from Persistence import load_inventory, save_inventory
-from Ui import add_product_ui, update_stock_ui, search_product_ui, remove_product_ui, create_order_ui
+from Ui import add_product_ui, update_stock_ui, search_product_ui, remove_product_ui, create_order_ui, load_products_ui
 
 
 def main() -> None:
@@ -13,8 +13,9 @@ def main() -> None:
         print("4. Search Product 🔍")
         print("5. Remove Product 🗑️")
         print("6. Create Order 🧾")
-        print("7. Save Inventory 💾")
-        print("8. Save and Quit 🚪")
+        print("7. Load Products from CSV 📥")
+        print("8. Save Inventory 💾")
+        print("9. Save and Quit 🚪")
 
         choice = input("\nEnter option: ").strip()
 
@@ -31,16 +32,18 @@ def main() -> None:
         elif choice == "6":
             create_order_ui(inventory)
         elif choice == "7":
+            load_products_ui(inventory)
+        elif choice == "8":
             print("\nSaving inventory...")
             save_inventory(inventory)
-        elif choice == "8":
+        elif choice == "9":
             print("\nSaving inventory before exit...")
             save_inventory(inventory)
             print("\nThank you for using Inventory Management System.")
             print("Program terminated.")
             break
         else:
-            print("Invalid option. Please enter a number between 1 and 8.")
+            print("Invalid option. Please enter a number between 1 and 9.")
 
 
 if __name__ == "__main__":

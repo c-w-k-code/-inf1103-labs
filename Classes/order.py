@@ -42,15 +42,20 @@ class Order:
                 return True
         return False
 
+    def calculate_subtotal(self) -> float:
+        """Total of all order lines before any discount."""
+        return sum(line.calculate_subtotal() for line in self._order_lines)
+
     def calculate_total(self) -> float:
         """Calculate the total cost of the order using the configured strategy."""
-        total: float = sum(line.calculate_subtotal() for line in self._order_lines)
-        return self._discount.apply(total)
+        return self._discount.apply(self.calculate_subtotal())
 
     def display_information(self) -> None:
         print(f"\nOrder ID: {self._order_id}")
         print("-------------------------")
         for order_line in self._order_lines:
             order_line.display_information()
+        print(f"Subtotal: ${self.calculate_subtotal():.2f}")
+        print(f"Discount: {type(self._discount).__name__}")
         print(f"Total Order Cost: ${self.calculate_total():.2f}")
         print("-------------------------")
