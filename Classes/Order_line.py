@@ -2,12 +2,16 @@ from __future__ import annotations
 
 from Product import Product
 
+
 class OrderLine:
     """One product and its quantity in an order.
-    
-    Product (assosciation). Created and managed by order (composition)"""
-    
+
+    Product (association). Created and managed by order (composition)
+    """
+
     def __init__(self, product: Product, quantity: int) -> None:
+        if quantity <= 0:
+            raise ValueError("Quantity must be greater than zero.")
         self._product: Product = product
         self._quantity: int = quantity
 
@@ -23,4 +27,7 @@ class OrderLine:
         return self.product.price * self.quantity
 
     def display_information(self) -> None:
-        print(f" {self._product.product_id} | {self.product.name} | Quantity: {self.quantity} | Subtotal: ${self.calculate_subtotal():.2f}")
+        print(
+            f" {self._product.product_id} | {self._product.name} | "
+            f"Quantity: {self.quantity} | Subtotal: ${self.calculate_subtotal():.2f}"
+        )
