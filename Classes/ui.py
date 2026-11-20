@@ -6,6 +6,8 @@ from Supplier import Supplier
 from Physical_product import PhysicalProduct
 from Digital_product import DigitalProduct
 
+from Product_factory import ProductFactory
+
 # -------------------------------------------------------------------
 # UI FUNCTIONS
 # -------------------------------------------------------------------
@@ -48,13 +50,13 @@ def add_product_ui(inventory: Inventory) -> None:
         price = float(input("Price: "))
         stock = int(input("Stock Quantity: "))
         if type_choice == "1":
-            weight = float(input("Weight (kg): "))
-            new_product = PhysicalProduct(product_id, name, price, stock, supplier, weight)
+            extra = float(input("Weight (kg): "))
+            new_product = ProductFactory.create("physical", product_id, name, price, stock, supplier, extra)
         else:
-            download_size = float(input("Download Size (MB): "))
-            new_product = DigitalProduct(product_id, name, price, stock, supplier, download_size)
-    except ValueError:
-        print("Invalid input. Price, weight and download size must be numbers and Stock must be an integer.")
+            extra = float(input("Download Size (MB): "))
+            new_product = ProductFactory.create("digital", product_id, name, price, stock, supplier, extra)
+    except ValueError as exc:
+        print(f"Invalid input: {exc}")
         return
 
     inventory.add_product(new_product)
