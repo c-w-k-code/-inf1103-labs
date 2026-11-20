@@ -23,20 +23,68 @@ def get_positive_float(prompt: str) -> float:
             print("Please enter a valid number, e.g. 12.50")
 
 
+def get_non_negative_float(prompt: str) -> float:
+    """Prompt until the user enters a valid float that is zero or more."""
+    while True:
+        try:
+            value = float(input(prompt))
+            if value < 0:
+                print("Please enter zero or a positive number.")
+                continue
+            return value
+        except ValueError:
+            print("Please enter a valid number, e.g. 2.5")
+
+
+def get_non_negative_int(prompt: str) -> int:
+    """Prompt until the user enters a whole number that is zero or more."""
+    while True:
+        try:
+            value = int(input(prompt))
+            if value < 0:
+                print("Please enter zero or a positive whole number.")
+                continue
+            return value
+        except ValueError:
+            print("Please enter a whole number, e.g. 10")
+
+
+def get_positive_int(prompt: str) -> int:
+    """Prompt until the user enters a whole number greater than zero."""
+    while True:
+        try:
+            value = int(input(prompt))
+            if value <= 0:
+                print("Please enter a whole number greater than zero.")
+                continue
+            return value
+        except ValueError:
+            print("Please enter a whole number, e.g. 3")
+
+
+def get_non_empty(prompt: str) -> str:
+    """Prompt until the user types something other than blank."""
+    while True:
+        value = input(prompt).strip()
+        if value:
+            return value
+        print("This field cannot be empty.")
+
+
 def _choose_supplier(inventory: Inventory) -> Supplier:
     """Reuse or create a new supplier for a product."""
     suppliers = {s.supplier_id.upper(): s for s in inventory.get_suppliers()}
     print("\nSuppliers:")
     for supplier in suppliers.values():
         supplier.display_information(indent="    ")
-    supplier_id = input("\nEnter Supplier ID (existing or new): ").strip()
+    supplier_id = get_non_empty("\nEnter Supplier ID (existing or new): ")
 
     existing = suppliers.get(supplier_id.upper())
     if existing is not None:
         return existing
 
-    name = input("Enter Supplier Name: ").strip()
-    contact_email = input("Enter Supplier Contact Email: ").strip()
+    name = get_non_empty("Enter Supplier Name: ")
+    contact_email = get_non_empty("Enter Supplier Contact Email: ")
     return Supplier(supplier_id, name, contact_email)
 
 
@@ -50,24 +98,24 @@ def add_product_ui(inventory: Inventory) -> None:
         print("Invalid product type.")
         return
 
-    product_id = input("Product ID: ").strip()
+    product_id = get_non_empty("Product ID: ")
     if inventory.search_product(product_id):
         print(f"Error: Product ID {product_id} already exists.")
         return
 
-    name = input("Product Name: ").strip()
+    name = get_non_empty("Product Name: ")
     supplier = _choose_supplier(inventory)
 
     price = get_positive_float("Price: ")
+    stock = get_non_negative_int("Stock Quantity: ")
     try:
-        stock = int(input("Stock Quantity: "))
         if type_choice == "1":
-            extra = float(input("Weight (kg): "))
+            extra = get_non_negative_float("Weight (kg): ")
             new_product = ProductFactory.create("physical", product_id, name, price, stock, supplier, extra)
         else:
-            extra = float(input("Download Size (MB): "))
+            extra = get_non_negative_float("Download Size (MB): ")
             new_product = ProductFactory.create("digital", product_id, name, price, stock, supplier, extra)
-    except ValueError as exc:
+    except ValueError as exc:  # safety net: the Product classes still enforce their own rules
         print(f"Invalid input: {exc}")
         return
 
@@ -86,12 +134,9 @@ def update_stock_ui(inventory: Inventory) -> None:
         print(f"Name: {product.name}")
         print(f"Current Stock: {product.stock}\n")
 
-        try:
-            new_stock = int(input("New Stock Quantity: "))
-            product.update_stock(new_stock)
-            print("\nStock quantity updated successfully! <(^-^)>")
-        except ValueError as exc:
-            print(f"Invalid stock value: {exc} Stock update canceled. :(")
+        new_stock = get_non_negative_int("New Stock Quantity: ")
+        product.update_stock(new_stock)
+        print("\nStock quantity updated successfully! <(^-^)>")
     else:
         print("Product not found.")
 
@@ -127,7 +172,7 @@ def remove_product_ui(inventory: Inventory) -> None:
 def create_order_ui(inventory: Inventory) -> None:
     """Build a new Order; OrderLines handled by itself."""
     print("\nCreate New Order")
-    order = Order(input("Enter Order ID: ").strip())
+    order = Order(get_non_empty("Enter Order ID: "))
 
     while True:
         product_id = input("\nEnter Product ID to add to order (leave blank to finish): ").strip()
@@ -139,12 +184,8 @@ def create_order_ui(inventory: Inventory) -> None:
             print("Product not found.")
             continue
 
-        try:
-            quantity = int(input(f"Enter quantity for {product.name}: "))
-            order.add_order_line(product, quantity)
-        except ValueError as exc:
-            print(f"Invalid quantity: {exc}")
-            continue
+        quantity = get_positive_int(f"Enter quantity for {product.name}: ")
+        order.add_order_line(product, quantity)
 
     if order.order_lines:
         order.display_information()

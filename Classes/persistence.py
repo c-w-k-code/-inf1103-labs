@@ -31,13 +31,17 @@ def _build_inventory(data: list[dict[str, Any]] | dict[str, Any]) -> Inventory:
 
 
 def load_inventory() -> Inventory:
-    """Load inventory from inventory.json, otherwise return default products."""
+    """Load inventory from inventory.json, otherwise return default products.
+
+    ValueError covers both bad JSON (JSONDecodeError is a ValueError) and saved
+    values that break validation rules, e.g. a price of 0 or negative stock.
+    """
     if os.path.exists(FILENAME):
         try:
             with open(FILENAME, "r", encoding="utf-8") as file:
                 data = json.load(file)
             return _build_inventory(data)
-        except (json.JSONDecodeError, OSError, KeyError, TypeError):
+        except (ValueError, OSError, KeyError, TypeError):
             print("Error reading saved file. Starting with default inventory.")
     return create_default_inventory()
 
